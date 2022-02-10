@@ -20,20 +20,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
+# json 데이터에서 key값에 따른 value를 return 하는 함수
+def get_secret(json_data, key):
+    try:
+        return json_data[key]
+    except KeyError:
+        error_msg = "Set the {} environment variable".format(key)
+        raise ImproperlyConfigured(error_msg)
+
 secret_file = os.path.join(BASE_DIR, 'secret_key.json')
 
 with open(secret_file) as f:
-    secrets = json.loads(f.read())
-
-def get_secret(setting, secrets=secrets):
-    try:
-        return secrets[setting]
-    except KeyError:
-        error_msg = "Set the {} environment variable".format(setting)
-        raise ImproperlyConfigured(error_msg)
+    secret_key = json.loads(f.read())
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = get_secret("SECRET_KEY")
+SECRET_KEY = get_secret(secret_key, "SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -44,12 +45,12 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.admin',         # 관리용 사이트
+    'django.contrib.auth',          # 인증 시스템
+    'django.contrib.contenttypes',  # 컨텐츠 타입을 위한 프레임워크
+    'django.contrib.sessions',      # 세션 프레임워크
+    'django.contrib.messages',      # 메세징 프레임워크
+    'django.contrib.staticfiles',   # 정적 파일을 관리하는 프레임워크
 ]
 
 MIDDLEWARE = [
@@ -86,13 +87,21 @@ WSGI_APPLICATION = 'django_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+db_file = os.path.join(BASE_DIR, 'postgresql.json')
+
+with open(db_file) as f:
+    db_info = json.loads(f.read())
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': get_secret(db_info, "NAME"),
+        'USER': get_secret(db_info, "USER"),
+        'PASSWORD': get_secret(db_info, "PASSWORD"),
+        'HOST': get_secret(db_info, "HOST"),
+        'PORT': get_secret(db_info, "PORT")
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
