@@ -49,8 +49,9 @@ INSTALLED_APPS = [
     'django.contrib.auth',          # 인증 시스템
     'django.contrib.contenttypes',  # 컨텐츠 타입을 위한 프레임워크
     'django.contrib.sessions',      # 세션 프레임워크
-    'django.contrib.messages',      # 메세징 프레임워크
+    'django.contrib.messages',      # 메시지 프레임워크
     'django.contrib.staticfiles',   # 정적 파일을 관리하는 프레임워크
+    'polls.apps.PollsConfig',       # 여론조사 앱
 ]
 
 MIDDLEWARE = [
